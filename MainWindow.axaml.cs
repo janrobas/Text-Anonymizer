@@ -8,6 +8,7 @@ namespace TextAnonymizer
     public partial class MainWindow : Window
     {
         private readonly OllamaService _ollamaService;
+        private bool _isProcessing;
 
         public MainWindow()
         {
@@ -17,6 +18,11 @@ namespace TextAnonymizer
 
         private async void OnAnonymizeClick(object? sender, RoutedEventArgs e)
         {
+            await ProcessAnonymization();
+        }
+
+        private async Task ProcessAnonymization()
+        {
             var inputText = InputTextBox.Text;
 
             if (string.IsNullOrWhiteSpace(inputText))
@@ -25,17 +31,20 @@ namespace TextAnonymizer
                 return;
             }
 
+            if (_isProcessing) return;
+
             try
             {
-                // Show loading state
-                LoadingOverlay.IsVisible = true;
+                _isProcessing = true;
+                
                 AnonymizeButton.IsEnabled = false;
+                AnonymizeButton.Content = "Processing...";
+                OutputTextBox.Text = "";
 
-                // Call service
-                var anonymizedText = await _ollamaService.AnonymizeAsync(inputText);
-
-                // Update UI
-                OutputTextBox.Text = anonymizedText;
+                await foreach (var chunk in _ollamaService.AnonymizeStreamAsync(inputText))
+                {
+                    OutputTextBox.Text += chunk;
+                }
             }
             catch (Exception ex)
             {
@@ -43,9 +52,10 @@ namespace TextAnonymizer
             }
             finally
             {
-                // Hide loading state
-                LoadingOverlay.IsVisible = false;
+                _isProcessing = false;
+                
                 AnonymizeButton.IsEnabled = true;
+                AnonymizeButton.Content = "Anonymize Text";
             }
         }
     }

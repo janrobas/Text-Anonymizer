@@ -12,7 +12,6 @@
         
     <Grid RowDefinitions="*, Auto, *" Margin="20">
         
-        <!-- Input Section -->
         <Border Grid.Row="0" CornerRadius="10" Background="{DynamicResource ControlFillColorDefaultBrush}" Margin="0,0,0,10" BoxShadow="0 4 10 0 #40000000">
             <Grid RowDefinitions="Auto, *">
                 <TextBlock Text="Original Text" FontWeight="SemiBold" Margin="10,10,0,5" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
@@ -24,8 +23,7 @@
             </Grid>
         </Border>
 
-        <!-- Action Section -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10">
+        <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,10">
             <Button Name="AnonymizeButton" Content="Anonymize Text" 
                     Padding="20,10" CornerRadius="20" 
                     FontSize="16" FontWeight="Bold"
@@ -33,10 +31,10 @@
                     Background="{DynamicResource SystemAccentColor}"
                     Foreground="White"
                     Cursor="Hand"
+                    HorizontalAlignment="Center"
                     Click="OnAnonymizeClick"/>
         </StackPanel>
 
-        <!-- Output Section -->
         <Border Grid.Row="2" CornerRadius="10" Background="{DynamicResource ControlFillColorDefaultBrush}" Margin="0,10,0,0" BoxShadow="0 4 10 0 #40000000">
              <Grid RowDefinitions="Auto, *">
                 <TextBlock Text="Anonymized Result" FontWeight="SemiBold" Margin="10,10,0,5" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
@@ -49,7 +47,6 @@
             </Grid>
         </Border>
         
-        <!-- Loading Overlay -->
         <Grid Grid.RowSpan="3" Name="LoadingOverlay" IsVisible="False" Background="#80000000">
             <Border Background="#252526" 
                     CornerRadius="10" Padding="40" Width="400"

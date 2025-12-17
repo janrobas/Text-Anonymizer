@@ -1,8 +1,8 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using System;
+using System.Collections.Generic;
 
 namespace TextAnonymizer
 {
@@ -30,10 +30,10 @@ namespace TextAnonymizer
             _kernel = kernelBuilder.Build();
         }
 
-        public async Task<string> AnonymizeAsync(string input)
+        public async IAsyncEnumerable<string> AnonymizeStreamAsync(string input)
         {
-            if (string.IsNullOrWhiteSpace(input))
-                return string.Empty;
+             if (string.IsNullOrWhiteSpace(input))
+                yield break;
 
             var prompt = $$"""
 You are a Text Anonymizer.
@@ -89,15 +89,14 @@ Input:
 Output:
 """;
 
-            try
+            var settings = new OpenAIPromptExecutionSettings { Temperature = 0 };
+            
+            await foreach (var update in _kernel.InvokePromptStreamingAsync(prompt, new KernelArguments(settings)))
             {
-                var settings = new OpenAIPromptExecutionSettings { Temperature = 0 };
-                var result = await _kernel.InvokePromptAsync(prompt, new KernelArguments(settings));
-                return result.ToString().Trim();
-            }
-            catch (Exception ex)
-            {
-                return $"Error connecting to Ollama via Semantic Kernel: {ex.Message}. Make sure Ollama is running and model '{_settings.ModelName}' is pulled.";
+                if (update != null)
+                {
+                    yield return update.ToString();
+                }
             }
         }
     }

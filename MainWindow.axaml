@@ -1,0 +1,66 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="TextAnonymizer.MainWindow"
+        Title="Anonymizer"
+        Width="800" Height="600"
+        WindowStartupLocation="CenterScreen"
+        TransparencyLevelHint="Mica"
+        Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+        
+    <Grid RowDefinitions="*, Auto, *" Margin="20">
+        
+        <!-- Input Section -->
+        <Border Grid.Row="0" CornerRadius="10" Background="{DynamicResource ControlFillColorDefaultBrush}" Margin="0,0,0,10" BoxShadow="0 4 10 0 #40000000">
+            <Grid RowDefinitions="Auto, *">
+                <TextBlock Text="Original Text" FontWeight="SemiBold" Margin="10,10,0,5" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                <TextBox Grid.Row="1" Name="InputTextBox" 
+                         AcceptsReturn="True" TextWrapping="Wrap" 
+                         Watermark="Paste error message or text here..."
+                         BorderThickness="0" Background="Transparent"
+                         Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            </Grid>
+        </Border>
+
+        <!-- Action Section -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10">
+            <Button Name="AnonymizeButton" Content="Anonymize Text" 
+                    Padding="20,10" CornerRadius="20" 
+                    FontSize="16" FontWeight="Bold"
+                    Classes="accent"
+                    Background="{DynamicResource SystemAccentColor}"
+                    Foreground="White"
+                    Cursor="Hand"
+                    Click="OnAnonymizeClick"/>
+        </StackPanel>
+
+        <!-- Output Section -->
+        <Border Grid.Row="2" CornerRadius="10" Background="{DynamicResource ControlFillColorDefaultBrush}" Margin="0,10,0,0" BoxShadow="0 4 10 0 #40000000">
+             <Grid RowDefinitions="Auto, *">
+                <TextBlock Text="Anonymized Result" FontWeight="SemiBold" Margin="10,10,0,5" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                <TextBox Grid.Row="1" Name="OutputTextBox" 
+                         AcceptsReturn="True" TextWrapping="Wrap" 
+                         IsReadOnly="True"
+                         Watermark="Anonymized output will appear here..."
+                         BorderThickness="0" Background="Transparent"
+                         Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            </Grid>
+        </Border>
+        
+        <!-- Loading Overlay -->
+        <Grid Grid.RowSpan="3" Name="LoadingOverlay" IsVisible="False" Background="#80000000">
+            <Border Background="#252526" 
+                    CornerRadius="10" Padding="40" Width="400"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    BoxShadow="0 6 20 0 #80000000">
+                <StackPanel>
+                    <TextBlock Text="Processing..." FontWeight="SemiBold" Margin="0,0,0,20" HorizontalAlignment="Center" Foreground="White"/>
+                    <ProgressBar IsIndeterminate="True" HorizontalAlignment="Stretch" MaxWidth="320" Height="4"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+    </Grid>
+</Window>

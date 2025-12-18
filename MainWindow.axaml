@@ -23,7 +23,7 @@
             </Grid>
         </Border>
 
-        <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,10">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10" Spacing="10">
             <Button Name="AnonymizeButton" Content="Anonymize Text" 
                     Padding="20,10" CornerRadius="20" 
                     FontSize="16" FontWeight="Bold"
@@ -33,6 +33,15 @@
                     Cursor="Hand"
                     HorizontalAlignment="Center"
                     Click="OnAnonymizeClick"/>
+            
+            <Button Name="StopButton" Content="Stop" 
+                    Padding="20,10" CornerRadius="20" 
+                    FontSize="16" FontWeight="Bold"
+                    Background="#D32F2F"
+                    Foreground="White"
+                    Cursor="Hand"
+                    IsVisible="False"
+                    Click="OnStopClick"/>
         </StackPanel>
 
         <Border Grid.Row="2" CornerRadius="10" Background="{DynamicResource ControlFillColorDefaultBrush}" Margin="0,10,0,0" BoxShadow="0 4 10 0 #40000000">

@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TextAnonymizer
@@ -9,16 +10,22 @@ namespace TextAnonymizer
     {
         private readonly OllamaService _ollamaService;
         private bool _isProcessing;
+        private CancellationTokenSource? _cts;
 
-        public MainWindow()
+        public MainWindow(OllamaService ollamaService)
         {
             InitializeComponent();
-            _ollamaService = new OllamaService();
+            _ollamaService = ollamaService;
         }
 
         private async void OnAnonymizeClick(object? sender, RoutedEventArgs e)
         {
             await ProcessAnonymization();
+        }
+
+        private void OnStopClick(object? sender, RoutedEventArgs e)
+        {
+            _cts?.Cancel();
         }
 
         private async Task ProcessAnonymization()
@@ -36,15 +43,21 @@ namespace TextAnonymizer
             try
             {
                 _isProcessing = true;
+                _cts = new CancellationTokenSource();
                 
                 AnonymizeButton.IsEnabled = false;
-                AnonymizeButton.Content = "Processing...";
+                AnonymizeButton.Content = "Anonymizing...";
+                StopButton.IsVisible = true;
                 OutputTextBox.Text = "";
 
-                await foreach (var chunk in _ollamaService.AnonymizeStreamAsync(inputText))
+                await foreach (var chunk in _ollamaService.AnonymizeStreamAsync(inputText, _cts.Token))
                 {
                     OutputTextBox.Text += chunk;
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                OutputTextBox.Text += "\n\n[Anonymization stopped by user]";
             }
             catch (Exception ex)
             {
@@ -53,9 +66,12 @@ namespace TextAnonymizer
             finally
             {
                 _isProcessing = false;
+                _cts?.Dispose();
+                _cts = null;
                 
                 AnonymizeButton.IsEnabled = true;
                 AnonymizeButton.Content = "Anonymize Text";
+                StopButton.IsVisible = false;
             }
         }
     }

@@ -1,8 +1,10 @@
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace TextAnonymizer
 {
@@ -11,28 +13,15 @@ namespace TextAnonymizer
         private readonly Kernel _kernel;
         private readonly OllamaSettings _settings;
 
-        public OllamaService()
+        public OllamaService(Kernel kernel, IOptions<OllamaSettings> settings)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-
-            IConfiguration config = builder.Build();
-            _settings = config.GetSection("Ollama").Get<OllamaSettings>() ?? new OllamaSettings();
-
-            var kernelBuilder = Kernel.CreateBuilder();
-            kernelBuilder.AddOpenAIChatCompletion(
-                modelId: _settings.ModelName,
-                apiKey: "ollama", // API key not required for local Ollama
-                endpoint: new Uri(_settings.Url)
-            );
-            
-            _kernel = kernelBuilder.Build();
+            _kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
+            _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
         }
 
-        public async IAsyncEnumerable<string> AnonymizeStreamAsync(string input)
+        public async IAsyncEnumerable<string> AnonymizeStreamAsync(string input, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-             if (string.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrWhiteSpace(input))
                 yield break;
 
             var prompt = $$"""
@@ -89,9 +78,9 @@ Input:
 Output:
 """;
 
-            var settings = new OpenAIPromptExecutionSettings { Temperature = 0 };
-            
-            await foreach (var update in _kernel.InvokePromptStreamingAsync(prompt, new KernelArguments(settings)))
+            var settings = new OpenAIPromptExecutionSettings { Temperature = _settings.Temperature };
+
+            await foreach (var update in _kernel.InvokePromptStreamingAsync(prompt, new KernelArguments(settings), cancellationToken: cancellationToken))
             {
                 if (update != null)
                 {

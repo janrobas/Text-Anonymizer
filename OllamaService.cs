@@ -26,7 +26,7 @@ namespace TextAnonymizer
 
             var prompt = $$"""
 You are a Text Anonymizer.
-Task: Replace IPs, URLs, file paths, and names with placeholders [IP], [URL], [PATH], [NAME], [SECRET].
+Task: Replace IPs, URLs, file paths, names, and secrets with placeholders [IP], [URL], [PATH], [NAME], [SECRET].
 CRITICAL RULES:
 1. PRESERVE THE EXACT FORMAT AND LENGTH. DO NOT OMIT ANY LINES.
 2. DO NOT output markdown code blocks (```). 
